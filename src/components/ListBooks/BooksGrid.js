@@ -12,8 +12,8 @@ class BooksGrid extends React.Component {
         return (
             <ol className="books-grid">
                 {
-                    books.map((b, index) => (
-                        <li key={b + index}>
+                    books.map((b) => (
+                        <li key={b.id}>
                             <div className="book">
                                 <div className="book-top">
                                     <div className="book-cover" style={{

@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
+import _ from 'lodash'
 import {search} from "../BooksAPI"
 import BooksGrid from "./ListBooks/BooksGrid"
 
@@ -15,40 +16,38 @@ class SearchBooks extends React.Component {
         loading: PropTypes.bool.isRequired,
         existingBooks: PropTypes.array.isRequired
     }
+
     updateSearchTerm = (searchTerm) => {
         this.setState(() => ({
             searchTerm: searchTerm,
             searching: true
         }))
-
         this.searchBooks(searchTerm)
     }
-    searchBooks = (searchTerm) => {
+    searchBooks =  _.debounce(function (searchTerm) {
         if (searchTerm !== ''){
-            setTimeout(() => {
-                search(searchTerm).then((books) => {
-                    const { existingBooks } = this.props;
-                    let mergedBooks = [];
-                    if (books.length > 0){
-                        mergedBooks = books.map((book) => {
-                            const item = existingBooks.find((existing) => existing.id === book.id)
-                            return item ? item : book;
-                        })
-                    }
-                    this.setState(() => ({
-                        books: mergedBooks,
-                        loading: false,
-                        searching: false
-                    }))
-                })
-            }, 500)
+            search(searchTerm).then((books) => {
+                const { existingBooks } = this.props;
+                let mergedBooks = [];
+                if (books.length > 0){
+                    mergedBooks = books.map((book) => {
+                        const item = existingBooks.find((existing) => existing.id === book.id)
+                        return item ? item : book;
+                    })
+                }
+                this.setState(() => ({
+                    books: mergedBooks,
+                    loading: false,
+                    searching: false
+                }))
+            })
         }else{
             this.setState(() => ({
                 books: []
             }))
         }
-    }
-
+        console.log(searchTerm)
+    }, 500)
     render() {
         const { books, searchTerm,searching } = this.state
         return (
